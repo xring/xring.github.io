@@ -86,7 +86,7 @@
     root: '/',
     scheme: 'Gemini',
     version: '6.4.2',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":false,"onmobile":false},
     fancybox: false,
     fastclick: false,
     lazyload: false,
@@ -112,7 +112,7 @@
 <meta name="keywords" content="private-registry">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kubernetes 从私有镜像仓库拉取镜像">
-<meta property="og:url" content="https://xring.info/2019/kubernetes-pull-images-with-private-registry.html">
+<meta property="og:url" content="https://xring.github.io/2019/kubernetes-pull-images-with-private-registry.html">
 <meta property="og:site_name" content="-炎屾-">
 <meta property="og:description" content="在企业内部使用 private registry 来存储私有镜像显然是必需的，本例的私仓使用 Harbor，下面来看看在 Kubernetes 集群中怎么配置使用我们建立的私有镜像仓库。假设私有镜像仓库地址为：https://hub.xring.info，我们要用的镜像为 nginx:v0.1.0，存在仓库 mynginx 中。如果使用 docker pull 来拉取镜像则命令为： 1docker">
 <meta property="og:locale" content="zh-CN">
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="https://xring.info/2019/kubernetes-pull-images-with-private-registry.html">
+  <link rel="canonical" href="https://xring.github.io/2019/kubernetes-pull-images-with-private-registry.html">
 
 
 
@@ -296,7 +296,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xring.info/2019/kubernetes-pull-images-with-private-registry.html">
+    <link itemprop="mainEntityOfPage" href="https://xring.github.io/2019/kubernetes-pull-images-with-private-registry.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="xring">
@@ -461,7 +461,7 @@
     <strong>本文作者： </strong>xring</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://xring.info/2019/kubernetes-pull-images-with-private-registry.html" title="Kubernetes 从私有镜像仓库拉取镜像">https://xring.info/2019/kubernetes-pull-images-with-private-registry.html</a>
+    <a href="https://xring.github.io/2019/kubernetes-pull-images-with-private-registry.html" title="Kubernetes 从私有镜像仓库拉取镜像">https://xring.github.io/2019/kubernetes-pull-images-with-private-registry.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处！</li>
@@ -708,6 +708,11 @@
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -733,11 +738,7 @@
 
 
 
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.8.0</div>
 
-
-
-  <span class="post-meta-divider">|</span>
 
 
 
@@ -765,11 +766,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     

@@ -86,7 +86,7 @@
     root: '/',
     scheme: 'Gemini',
     version: '6.4.2',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":false,"onmobile":false},
     fancybox: false,
     fastclick: false,
     lazyload: false,
@@ -112,7 +112,7 @@
 <meta name="keywords" content="istio">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Istio 中配置 Envoy 获取 Client 真实 IP">
-<meta property="og:url" content="https://xring.info/2019/istio-envoy-get-client-real-ip.html">
+<meta property="og:url" content="https://xring.github.io/2019/istio-envoy-get-client-real-ip.html">
 <meta property="og:site_name" content="-炎屾-">
 <meta property="og:description" content="背景：使用 Istio Ingress Gateway (Envoy)，需要获取客户端真实 IP 地址  使用 Helm 安装 Istio 会安装一个名为 istio-ingressgateway 的 Service，类型为 LoadBalancer，可以将服务暴露到公网。  这个 Service 的 spec.externalTrafficPolicy 默认值是 Cluster，我们只要将这个">
 <meta property="og:locale" content="zh-CN">
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="https://xring.info/2019/istio-envoy-get-client-real-ip.html">
+  <link rel="canonical" href="https://xring.github.io/2019/istio-envoy-get-client-real-ip.html">
 
 
 
@@ -296,7 +296,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xring.info/2019/istio-envoy-get-client-real-ip.html">
+    <link itemprop="mainEntityOfPage" href="https://xring.github.io/2019/istio-envoy-get-client-real-ip.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="xring">
@@ -432,7 +432,7 @@
     <strong>本文作者： </strong>xring</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://xring.info/2019/istio-envoy-get-client-real-ip.html" title="Istio 中配置 Envoy 获取 Client 真实 IP">https://xring.info/2019/istio-envoy-get-client-real-ip.html</a>
+    <a href="https://xring.github.io/2019/istio-envoy-get-client-real-ip.html" title="Istio 中配置 Envoy 获取 Client 真实 IP">https://xring.github.io/2019/istio-envoy-get-client-real-ip.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处！</li>
@@ -650,6 +650,11 @@
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -675,11 +680,7 @@
 
 
 
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.8.0</div>
 
-
-
-  <span class="post-meta-divider">|</span>
 
 
 
@@ -707,11 +708,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     
