@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>xring&#x27;s blog</title>
+    <link rel="self" type="application/atom+xml" href="https://xring.net/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://xring.net"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2024-03-28T00:00:00+00:00</updated>
+    <id>https://xring.net/atom.xml</id>
+    <entry xml:lang="en">
+        <title>在 Cargo 项目中使用 git 仓库作为依赖</title>
+        <published>2024-03-28T00:00:00+00:00</published>
+        <updated>2024-03-28T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/cargo-dependencies-from-git/"/>
+        <id>https://xring.net/cargo-dependencies-from-git/</id>
+        
+        <content type="html" xml:base="https://xring.net/cargo-dependencies-from-git/">&lt;p&gt;在 Cargo 项目中，最简单的依赖方式为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;serde &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;这会直接使用 &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;&quot;&gt;crates.io&lt;&#x2F;a&gt; 的依赖和版本，某些时候可能需要从源码仓库直接依赖某个分支或者依赖未发布到 &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;&quot;&gt;crates.io&lt;&#x2F;a&gt; 。此时，最小化的配置为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;regex &lt;&#x2F;span&gt;&lt;span&gt;= { &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;regex.git&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot; }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;如果需要指定分支，可以配置为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;regex &lt;&#x2F;span&gt;&lt;span&gt;= { &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;regex.git&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;branch &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;next&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot; }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;上面两种使用基于 HTTPS 的认证，如果项目是非开仓库，需要进行额外配置，参考&lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;cargo&#x2F;appendix&#x2F;git-authentication.html#https-authentication&quot;&gt;这里&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;另外一种是基于 SSH 的认证，此时相关配置格式为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;regex &lt;&#x2F;span&gt;&lt;span&gt;= { &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;ssh:&#x2F;&#x2F;git@example.com&#x2F;user&#x2F;repo.git&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot; }
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;基于 SSH 的认证要求 &lt;code&gt;ssh-agent&lt;&#x2F;code&gt;，可以使用下面的方式快速添加：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# 注意 SSH 的私钥位置
+&lt;&#x2F;span&gt;&lt;span&gt;ssh-add ~&#x2F;.ssh&#x2F;id_rsa
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;使用 &lt;code&gt;ssh-add -l&lt;&#x2F;code&gt; 来确认密钥已经成功添加到 &lt;code&gt;ssh-agent&lt;&#x2F;code&gt;。&lt;&#x2F;p&gt;
+&lt;p&gt;如果 SSH 密钥是有密码的，这个步骤需要输入密码。通过 &lt;code&gt;ssh-agent&lt;&#x2F;code&gt; 后续 Cargo 访问私仓时将不需要输入密码。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Xcode 15.2 安装 iOS_17.2_Simulator</title>
+        <published>2023-01-23T00:00:00+00:00</published>
+        <updated>2023-01-23T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/xcode-15-2-install-ios-17-2-simulator/"/>
+        <id>https://xring.net/xcode-15-2-install-ios-17-2-simulator/</id>
+        
+        <content type="html" xml:base="https://xring.net/xcode-15-2-install-ios-17-2-simulator/">&lt;p&gt;更新 Xcode 到 15.2 之后，需要安装iOS_17.2_Simulator，但是在 Xcode 里下载总是网络错误，或者下载卡在 99% 的地方，可以用如下步骤来手动安装。&lt;&#x2F;p&gt;
+&lt;p&gt;打开官网 &lt;a href=&quot;https:&#x2F;&#x2F;developer.apple.com&#x2F;download&#x2F;all&#x2F;?q=ios&quot;&gt;https:&#x2F;&#x2F;developer.apple.com&#x2F;download&#x2F;all&#x2F;?q=ios&lt;&#x2F;a&gt;，登录后选择下载 &lt;code&gt;iOS 17.2 Simulator Runtime.dmg&lt;&#x2F;code&gt; 文件。&lt;&#x2F;p&gt;
+&lt;p&gt;假设文件存储到 &lt;code&gt;~&#x2F;Downloads&lt;&#x2F;code&gt;，在终端依次执行下面的命令：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 下面这条命令需要输入密码
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;sudo&lt;&#x2F;span&gt;&lt;span&gt; xcode-select&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -s&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;Applications&#x2F;Xcode.app
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;xcodebuild -runFirstLaunch 
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 需要替换为自己的路径，下面这条命令需要一些时间来执行
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 执行完成终端会有输出，且会弹窗提示 &amp;quot;Verifying...&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;xcrun&lt;&#x2F;span&gt;&lt;span&gt; simctl runtime add &amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&#x2F;Users&#x2F;xring&#x2F;Downloads&#x2F;iOS_17.2_Simulator_Runtime.dmg&lt;&#x2F;span&gt;&lt;span&gt;&amp;#39;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后在 Xcode 就可以看到 iOS_17.2_Simulator 了。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>博客迁移至 Zola</title>
+        <published>2023-01-21T00:00:00+00:00</published>
+        <updated>2023-01-21T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/blog-upgraded-to-zola/"/>
+        <id>https://xring.net/blog-upgraded-to-zola/</id>
+        
+        <content type="html" xml:base="https://xring.net/blog-upgraded-to-zola/">&lt;p&gt;从19年参与“创业”至今，已经很长时间没有停下来做一些思考和总结了，也有很长时间没有将学的知识、踩的坑、买的教训等等来沉淀一下。TODO 里面记录了很多想要系统学习的内空，有书籍有视频有博客等等，很多时间脑子懂了不代表手懂了，那就多做一些记录吧。&lt;&#x2F;p&gt;
+&lt;p&gt;于是，博客迁移到 Rust 实现的 &lt;a href=&quot;https:&#x2F;&#x2F;www.getzola.org&#x2F;&quot;&gt;Zola&lt;&#x2F;a&gt;，选择了一个简单的主题 &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pawroman&#x2F;zola-theme-terminimal&quot;&gt;terminimal&lt;&#x2F;a&gt;，主题参照 &lt;a href=&quot;https:&#x2F;&#x2F;heitorpb.github.io&#x2F;&quot;&gt;Heitor&#x27;s Log&lt;&#x2F;a&gt; 进行了简单的装修 ，再搭配了一个基于 GitHub Discussions 的评论系统 &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;apps&#x2F;giscus&quot;&gt;giscus&lt;&#x2F;a&gt;。基本就可以用起来了，等需要的时候再去折腾一下图床，就可以用来承载内容了。&lt;&#x2F;p&gt;
+&lt;p&gt;站点美容告一段落，希望每个月至少有两篇输出吧。&lt;&#x2F;p&gt;
+&lt;p&gt;自勉。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Istio 中配置 Envoy 获取 Client 真实 IP</title>
+        <published>2019-03-22T00:00:00+00:00</published>
+        <updated>2019-03-22T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/istio-gateway-get-client-ip/"/>
+        <id>https://xring.net/istio-gateway-get-client-ip/</id>
+        
+        <content type="html" xml:base="https://xring.net/istio-gateway-get-client-ip/">&lt;p&gt;背景：使用 Istio Ingress Gateway(Envoy)，需要获取客户端真实 IP 地址&lt;&#x2F;p&gt;
+&lt;p&gt;使用 Helm 安装 Istio 会安装一个名为 &lt;code&gt;istio-ingressgateway&lt;&#x2F;code&gt; 的 Service，类型为 &lt;code&gt;LoadBalancer&lt;&#x2F;code&gt;，可以将服务暴露到公网。 &lt;&#x2F;p&gt;
+&lt;p&gt;这个 Service 的 &lt;code&gt;spec.externalTrafficPolicy&lt;&#x2F;code&gt; 默认值是 &lt;code&gt;Cluster&lt;&#x2F;code&gt;，我们只要将这个值更新为&lt;code&gt;Local&lt;&#x2F;code&gt;，就可以在 &lt;code&gt;X-Forwarded-For&lt;&#x2F;code&gt; 请求头获取到客户端真实 IP 地址了。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Kubernetes 从私有镜像仓库拉取镜像</title>
+        <published>2019-01-11T00:00:00+00:00</published>
+        <updated>2019-01-11T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/k8s-pull-images-from-private-registry/"/>
+        <id>https://xring.net/k8s-pull-images-from-private-registry/</id>
+        
+        <content type="html" xml:base="https://xring.net/k8s-pull-images-from-private-registry/">&lt;p&gt;在企业内部使用 private registry 来存储私有镜像显然是必需的，本例的私仓使用 &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;goharbor&#x2F;harbor&quot;&gt;Harbor&lt;&#x2F;a&gt;，下面来看看在 Kubernetes 集群中怎么配置使用我们建立的私有镜像仓库。假设私有镜像仓库地址为：&lt;code&gt;https:&#x2F;&#x2F;hub.xring.info&lt;&#x2F;code&gt;，我们要用的镜像为 nginx:v0.1.0，存在仓库 mynginx 中。如果使用 docker pull 来拉取镜像则命令为：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;docker pull hub.xring.info&#x2F;mynginx&#x2F;nginx:v0.1.0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;为了在 Kubernetes 中使用私有镜像仓库，我们需要做两个事：&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;创建一个存储了私有镜像 credential 信息的 Secret 资源对象&lt;&#x2F;li&gt;
+&lt;li&gt;在 Pod 创建模板使用 spec.imagePullSecrets 中指定创建的 Secret 对象&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;!--more--&gt;
+&lt;h3 id=&quot;chuang-jian-secret-zi-yuan-dui-xiang&quot;&gt;创建 Secret 资源对象&lt;&#x2F;h3&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;kubectl create secret docker-registry my-hub-secret --docker-server=hub.xring.info --docker-username=xbot --docker-password=123456 --docker-email=xbot@xring.info
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;zhi-ding-secret-dui-xiang&quot;&gt;指定 Secret 对象&lt;&#x2F;h3&gt;
+&lt;p&gt;以下面的 Pod 资源定义为例：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;yml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-yml &quot;&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;apiVersion&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;v1
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;kind&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Pod
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;metadata&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;nginx-v010
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;labels&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;app&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;nginx-v010
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;spec&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;imagePullSecrets&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  - &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;my-hub-secret
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;containers&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  - &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;image&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;hub.xring.info&#x2F;mynginx&#x2F;nginx:v0.1.0
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;nginx-v010
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后再使用 &lt;code&gt;kubectl apply -f mynginx.yaml&lt;&#x2F;code&gt; 来创建 Pod 对象，就可以从私有镜像仓库中拉取镜像了。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Maven 设置 HTTP 代理</title>
+        <published>2017-02-10T00:00:00+00:00</published>
+        <updated>2017-02-10T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/maven-setup-http-proxy/"/>
+        <id>https://xring.net/maven-setup-http-proxy/</id>
+        
+        <content type="html" xml:base="https://xring.net/maven-setup-http-proxy/">&lt;p&gt;有时候基于公司安全因素考虑或者由于一些特殊原因，Maven 无法正常访问外部仓库来下载所需要的资源。这种情况下，可以通过为 Maven 配置 HTTP 代理来解决问题。&lt;&#x2F;p&gt;
+&lt;p&gt;通过以下步骤来为 Maven 配置 HTTP 代理：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;- 获取 HTTP 代理信息
+&lt;&#x2F;span&gt;&lt;span&gt;- 找到 Maven 配置文件 settings.xml
+&lt;&#x2F;span&gt;&lt;span&gt;- 将代理信息添加到配置文件
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;假设我们有如下 HTTP 代理信息：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;host: 9.30.123.123
+&lt;&#x2F;span&gt;&lt;span&gt;port: 3712
+&lt;&#x2F;span&gt;&lt;span&gt;username: xring
+&lt;&#x2F;span&gt;&lt;span&gt;password: volcano
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;下一步来寻找 Maven 配置文件。&lt;code&gt;settimgs.xml&lt;&#x2F;code&gt; 文件可能存在于两个位置：
+– ~&#x2F;.m2&#x2F;settings.xml
+– M2_HOME&#x2F;conf&#x2F;settings.xml&lt;&#x2F;p&gt;
+&lt;p&gt;如果 &lt;code&gt;~&#x2F;.m2&#x2F;settings.xml&lt;&#x2F;code&gt; 文件存在，则 &lt;code&gt;优先&lt;&#x2F;code&gt; 使用这个文件进行配置，如果不存在则需要使用 &lt;code&gt;M2_HOME&#x2F;conf&#x2F;settings.xml&lt;&#x2F;code&gt; 文件。如果没有配置 &lt;code&gt;M2_HOME&lt;&#x2F;code&gt; 这个环境变量或者忘记了 Maven 的安装位置，可以通过 &lt;code&gt;mvn -version&lt;&#x2F;code&gt; 可以找到 Maven home 目录，即上面提到的 &lt;code&gt;M2_HOME&lt;&#x2F;code&gt;，在 Mac 下得到类似输出：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;mvn -version
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;Maven&lt;&#x2F;span&gt;&lt;span&gt; home: &#x2F;usr&#x2F;local&#x2F;Cellar&#x2F;maven&#x2F;3.3.9&#x2F;libexec
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;则 &lt;code&gt;settimgs.xml&lt;&#x2F;code&gt; 文件就在 &lt;code&gt;&#x2F;usr&#x2F;local&#x2F;Cellar&#x2F;maven&#x2F;3.3.9&#x2F;libexec&#x2F;conf&lt;&#x2F;code&gt; 目录中。&lt;&#x2F;p&gt;
+&lt;p&gt;编辑找到的 settings.xml 文件，搜索 proxies 关键字，找到类似下面的这一段：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;xml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-xml &quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&amp;lt;!-- proxy
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;   | Specification for one proxy, to be used in connecting to the network.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;  &amp;lt;proxy&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;id&amp;gt;optional&amp;lt;&#x2F;id&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;active&amp;gt;true&amp;lt;&#x2F;active&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;protocol&amp;gt;http&amp;lt;&#x2F;protocol&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;username&amp;gt;proxyuser&amp;lt;&#x2F;username&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;password&amp;gt;proxypass&amp;lt;&#x2F;password&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;host&amp;gt;proxy.host.net&amp;lt;&#x2F;host&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;port&amp;gt;80&amp;lt;&#x2F;port&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;nonProxyHosts&amp;gt;local.net|some.host.com&amp;lt;&#x2F;nonProxyHosts&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;  &amp;lt;&#x2F;proxy&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;  --&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;在 proxies 下可以配置多个 proxy 元素，如果声明了多个 proxy 元素，则默认情况下第一个被激活的 proxy 元素会被使用。
+当 proxy 元素里的 active 被设置为 true 时表示该 proxy 处于激活状态。
+id 字段是 proxy 元素的一个标识
+当代理不需要认证时，username 和 password 可以被注释掉
+nonProxyHost 元素用来指定哪些主机名不需要代理，当有多个主机名不需要代理时用 | 来分隔主机名，主机名里支持通配符（如 *.google.com）。&lt;&#x2F;p&gt;
+&lt;p&gt;了解了这段 XML 各元素的意义后将得到的 HTTP 代理信息依次填入相应元素：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;xml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-xml &quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxy&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;id&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;volcano-proxy&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;id&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;active&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;true&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;active&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;protocol&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;http&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;protocol&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;username&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;xring&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;username&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;password&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;volcano&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;password&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;host&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;9.30.123.123&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;host&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;port&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;3712&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;port&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&amp;lt;!--
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;nonProxyHosts&amp;gt;local.net|some.host.com&amp;lt;&#x2F;nonProxyHosts&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    --&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxy&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;保存 &lt;code&gt;settings.xml&lt;&#x2F;code&gt; 配置文件，Maven 配置 HTTP 代理完成。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Docker 手动迁移镜像</title>
+        <published>2017-02-02T00:00:00+00:00</published>
+        <updated>2017-02-02T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/docker-manually-transfer-image/"/>
+        <id>https://xring.net/docker-manually-transfer-image/</id>
+        
+        <content type="html" xml:base="https://xring.net/docker-manually-transfer-image/">&lt;p&gt;使用公共或者私有的 Registry 可以方便的将 Docker 镜像进行转移，在某些场景可能期望手动来迁移镜像。&lt;&#x2F;p&gt;
+&lt;p&gt;此时可以使用 &lt;code&gt;docker save&lt;&#x2F;code&gt; 和 &lt;code&gt;docker load&lt;&#x2F;code&gt; 指令将镜像打包然后在其它位置加载回来。这里使用 nginx 镜像来做演示，将镜像从一台机器手动迁移到另一台机器。&lt;&#x2F;p&gt;
+&lt;!--more--&gt;
+&lt;h3 id=&quot;da-bao-jing-xiang&quot;&gt;打包镜像&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;docker&lt;&#x2F;span&gt;&lt;span&gt; save&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -o&lt;&#x2F;span&gt;&lt;span&gt; nginx.tar nginx:latest
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后 &lt;code&gt;nginx:latest&lt;&#x2F;code&gt; 镜像被打包为 &lt;code&gt;nginx.tar&lt;&#x2F;code&gt; 文件，此时可以通过 scp 之类的方法传输这个镜像文件。&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在打包过程中可以使用类似 &lt;code&gt;docker save  nginx | gzip &amp;gt; nginx.tar.gz&lt;&#x2F;code&gt; 的命令进行压缩减小文件体积。&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;更多参数请参考 &lt;a href=&quot;https:&#x2F;&#x2F;docs.docker.com&#x2F;engine&#x2F;reference&#x2F;commandline&#x2F;save&#x2F;&quot;&gt;官方文档&lt;&#x2F;a&gt; 对此命令的说明。&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;jia-zai-jing-xiang&quot;&gt;加载镜像&lt;&#x2F;h3&gt;
+&lt;p&gt;在另一台没有 &lt;code&gt;nginx:latest&lt;&#x2F;code&gt; 镜像的机器上执行：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;docker&lt;&#x2F;span&gt;&lt;span&gt; load&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -i&lt;&#x2F;span&gt;&lt;span&gt; nginx.tar
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 下面为命令输出
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;3358360aedad:&lt;&#x2F;span&gt;&lt;span&gt; Loading layer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;[&lt;&#x2F;span&gt;&lt;span&gt;==================================================&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt;  58.44MB&#x2F;58.44MB
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;c632afbadb38:&lt;&#x2F;span&gt;&lt;span&gt; Loading layer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;[&lt;&#x2F;span&gt;&lt;span&gt;==================================================&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt;  53.91MB&#x2F;53.91MB
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;180ab8f004dc:&lt;&#x2F;span&gt;&lt;span&gt; Loading layer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;[&lt;&#x2F;span&gt;&lt;span&gt;==================================================&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt;  3.584kB&#x2F;3.584kB
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;执行完成后 &lt;code&gt;nginx:latest&lt;&#x2F;code&gt; 镜像就被手动迁移到了另一台机器上。&lt;&#x2F;p&gt;
+&lt;p&gt;更多参数请参考 &lt;a href=&quot;https:&#x2F;&#x2F;docs.docker.com&#x2F;engine&#x2F;reference&#x2F;commandline&#x2F;load&#x2F;&quot;&gt;官方文档&lt;&#x2F;a&gt; 对此命令的说明。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>
