@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Rust 中的 LazyLock 和 OnceLock | xring&#x27;s blog</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://xring.net/style.css">
+    <link rel="stylesheet" href="https://xring.net/color/orange.css">
+
+        <link rel="stylesheet" href="https://xring.net/color/background_blue.css">
+    
+    <link rel="stylesheet" href="https://xring.net/font-hack-subset.css">
+
+    <meta name="description" content="">
+
+    <meta property="og:description" content="">
+    <meta property="og:title" content="Rust 中的 LazyLock 和 OnceLock | xring's blog">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://xring.net/lazylock-and-once-lock-in-rust/">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:title" content="Rust 中的 LazyLock 和 OnceLock | xring's blog">
+    <meta property="twitter:domain" content="xring.net">
+    <meta property="twitter:url" content="https://xring.net/lazylock-and-once-lock-in-rust/">
+
+            
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="https://xring.net/atom.xml">
+    
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <meta name="google-adsense-account" content="ca-pub-7408552055522076">
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ksf0q960y1");
+    </script>
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://xring.net" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            xring&#x27;s blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://xring.net">home</a></li>
+            
+                <li><a href="https://xring.net/tags">tags</a></li>
+            
+                <li><a href="https://xring.net/archive">archive</a></li>
+            
+                <li><a href="https://xring.net/about">about</a></li>
+            
+                <li><a href="https://xring.net/atom.xml">rss</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://xring.net/lazylock-and-once-lock-in-rust/">Rust 中的 LazyLock 和 OnceLock</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2025-01-02
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/rust/">#rust</a></span>
+    
+
+        <div class="post-content">
+            <p><code>LazyLock</code> 和 <code>OnceLock</code> 是 Rust 中用于实现惰性初始化的两种不同的锁机制。它们都可以用于延迟初始化某个值，直到第一次访问时才进行计算和存储。它们被视为对 <code>lazy_static</code> 和 <code>once_cell</code> 的现代替代方案，提供了更简洁和类型安全的接口。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">use </span><span>std::sync::LazyLock;
+</span><span>
+</span><span style="color:#b48ead;">static </span><span style="color:#d08770;">CONFIG</span><span>: LazyLock&lt;String&gt; = LazyLock::new(|| {
+</span><span>    </span><span style="color:#65737e;">// 运行时初始化逻辑
+</span><span>    println!(&quot;</span><span style="color:#a3be8c;">Initializing CONFIG...</span><span>&quot;);
+</span><span>    &quot;</span><span style="color:#a3be8c;">Runtime configuration</span><span>&quot;.</span><span style="color:#96b5b4;">to_string</span><span>()
+</span><span>});
+</span><span>
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span>    </span><span style="color:#65737e;">// 第一次访问时进行初始化
+</span><span>    println!(&quot;</span><span style="color:#a3be8c;">Config: </span><span style="color:#d08770;">{}</span><span>&quot;, *</span><span style="color:#d08770;">CONFIG</span><span>);
+</span><span>    </span><span style="color:#65737e;">// 再次访问时不会重新初始化
+</span><span>    println!(&quot;</span><span style="color:#a3be8c;">Config: </span><span style="color:#d08770;">{}</span><span>&quot;, *</span><span style="color:#d08770;">CONFIG</span><span>);
+</span><span>}
+</span></code></pre>
+<p><code>Initializing CONFIG...</code> 的内容只会被打印一次。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">use </span><span>std::sync::OnceLock;
+</span><span>
+</span><span style="color:#b48ead;">static </span><span style="color:#d08770;">CONFIG</span><span>: OnceLock&lt;String&gt; = OnceLock::new();
+</span><span>
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span>    </span><span style="color:#65737e;">// 第一次调用 get_or_init 时进行初始化
+</span><span>    </span><span style="color:#b48ead;">let</span><span> config = </span><span style="color:#d08770;">CONFIG</span><span>.</span><span style="color:#96b5b4;">get_or_init</span><span>(|| {
+</span><span>        println!(&quot;</span><span style="color:#a3be8c;">Initializing CONFIG...</span><span>&quot;);
+</span><span>        &quot;</span><span style="color:#a3be8c;">Runtime configuration</span><span>&quot;.</span><span style="color:#96b5b4;">to_string</span><span>()
+</span><span>    });
+</span><span>
+</span><span>    println!(&quot;</span><span style="color:#a3be8c;">Config: </span><span style="color:#d08770;">{}</span><span>&quot;, config);
+</span><span>
+</span><span>    </span><span style="color:#65737e;">// 再次调用 get_or_init 时不会重新初始化
+</span><span>    </span><span style="color:#b48ead;">let</span><span> config_again = </span><span style="color:#d08770;">CONFIG</span><span>.</span><span style="color:#96b5b4;">get_or_init</span><span>(|| {
+</span><span>        println!(&quot;</span><span style="color:#a3be8c;">This will not be printed.</span><span>&quot;);
+</span><span>        &quot;</span><span style="color:#a3be8c;">Another configuration</span><span>&quot;.</span><span style="color:#96b5b4;">to_string</span><span>()
+</span><span>    });
+</span><span>
+</span><span>    println!(&quot;</span><span style="color:#a3be8c;">Config again: </span><span style="color:#d08770;">{}</span><span>&quot;, config_again);
+</span><span>}
+</span></code></pre>
+<p>在已初始化的值上多次调用 <code>get_or_init</code> 不会重新初始化。</p>
+<p><code>LazyLock</code></p>
+<ul>
+<li>线程安全性: LazyLock 使用内部的同步机制来确保初始化逻辑只会执行一次，即使在多个线程同时访问的情况下。它通常用于全局静态变量的惰性初始化。</li>
+<li>使用场景: 适合在程序启动时就能确定初始化逻辑的场景，尤其是全局静态变量。</li>
+</ul>
+<p><code>OnceLock</code></p>
+<ul>
+<li>线程安全性: OnceLock 也使用同步机制来确保初始化逻辑只会执行一次。它提供了一个简单的 API 来在运行时进行初始化。</li>
+<li>使用场景: 适合需要在运行时初始化的场景，尤其是在需要确保某个值只被初始化一次的情况下。</li>
+</ul>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Read more</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://xring.net/2024-summary/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">2024 总结</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://xring.net/transfer-apple-watch-to-new-iphone/">
+                            <span class="button__text">将 Apple Watch 迁移到新 iPhone</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+    <div class="content">
+        <script src="https://giscus.app/client.js"
+        data-repo="xring/blog"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkyNDg0MDg2Mjg="
+        data-category="General"
+        data-category-id="DIC_kwDODs5qNM4CckbH"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+        </script>
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2025
+ xring</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a>
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

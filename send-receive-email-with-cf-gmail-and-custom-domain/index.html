@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>使用 Gmail 实现域名邮箱收发功能 | xring&#x27;s blog</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://xring.net/style.css">
+    <link rel="stylesheet" href="https://xring.net/color/orange.css">
+
+        <link rel="stylesheet" href="https://xring.net/color/background_blue.css">
+    
+    <link rel="stylesheet" href="https://xring.net/font-hack-subset.css">
+
+    <meta name="description" content="">
+
+    <meta property="og:description" content="">
+    <meta property="og:title" content="使用 Gmail 实现域名邮箱收发功能 | xring's blog">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://xring.net/send-receive-email-with-cf-gmail-and-custom-domain/">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:title" content="使用 Gmail 实现域名邮箱收发功能 | xring's blog">
+    <meta property="twitter:domain" content="xring.net">
+    <meta property="twitter:url" content="https://xring.net/send-receive-email-with-cf-gmail-and-custom-domain/">
+
+            
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="https://xring.net/atom.xml">
+    
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <meta name="google-adsense-account" content="ca-pub-7408552055522076">
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ksf0q960y1");
+    </script>
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://xring.net" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            xring&#x27;s blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://xring.net">home</a></li>
+            
+                <li><a href="https://xring.net/tags">tags</a></li>
+            
+                <li><a href="https://xring.net/archive">archive</a></li>
+            
+                <li><a href="https://xring.net/about">about</a></li>
+            
+                <li><a href="https://xring.net/atom.xml">rss</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://xring.net/send-receive-email-with-cf-gmail-and-custom-domain/">使用 Gmail 实现域名邮箱收发功能</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2023-04-06
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/cloudflare/">#cloudflare</a>&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/gmail/">#gmail</a></span>
+    
+
+        <div class="post-content">
+            <p>业界良心 Cloudflare 提供了很多实用的功能，其中之一就是 Email Routing，可以用来便捷的将自定义域名邮箱收到的邮件转发到某个目标邮箱。再配合上 Gmail 的一些设置，即可以轻松实现使用 Gmail 来收和发域名邮箱的邮件。</p>
+<blockquote>
+<p>域名需要在 Cloudflare 或者使用 Cloudflare 的 Nameserver</p>
+</blockquote>
+<h2 id="shou-you-jian">收邮件</h2>
+<ul>
+<li>在 Cloudflare 的控制台，选择配置 Email --&gt; Email Routing --&gt; Routes</li>
+<li>添加 自定义邮箱地址 xx@yy.com</li>
+<li>然后选择转发的<code>目标邮箱地址</code>即可。</li>
+</ul>
+<p>可以在 Destination addresses 处添加多个 目标邮箱地址。目标邮箱地址在第一次添加时需要进行验证操作。</p>
+<p>通过上面的配置，发送到 xx@yy.com 的邮件会被转发到配置的 目标邮箱地址，但是在 Gmail 回复邮件的时候仍然使用 目标邮箱地址。需要继续下面的配置才能将回信发件人地址修改为 xx@yy.com。</p>
+<h2 id="fa-you-jian">发邮件</h2>
+<ul>
+<li>需要 Gmail 开启了 2FA，https://myaccount.google.com/signinoptions/two-step-verification</li>
+<li>创建一个 Gmail 的 App 密码，https://security.google.com/settings/security/apppasswords 分别选择 Mail 和 Mac 两个选项后生成，得到密码 <code>ABC</code></li>
+<li>在 Gmail 页面，打开 see all settings --&gt; Accounts and Import --&gt; Send mail as --&gt; add another email address</li>
+<li>填写表单的第一步 Email Address 填写 xx@yy.com，即自定义域名邮箱</li>
+<li>填写表单的第二步 SMTP Server 填写 http://smtp.gmail.com，用户名填写 gmail 邮箱地址，密码填写上面得到的 ABC</li>
+<li>添加账户，然后在写信或者回信时就可以选择 xx@yy.com</li>
+</ul>
+<p>也可以在 Send mail as 处勾选 <code>Reply from the same address the message was sent to</code> 这样回信的时候就默认使用收信的地址了。</p>
+<p>配置好上面两个部分，就完成了使用 Gmail 来收和发域名邮箱的邮件。</p>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Read more</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://xring.net/xcode-15-2-install-ios-17-2-simulator/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Xcode 15.2 安装 iOS_17.2_Simulator</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://xring.net/cargo-dependencies-from-git/">
+                            <span class="button__text">在 Cargo 项目中使用 git 仓库作为依赖</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+    <div class="content">
+        <script src="https://giscus.app/client.js"
+        data-repo="xring/blog"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkyNDg0MDg2Mjg="
+        data-category="General"
+        data-category-id="DIC_kwDODs5qNM4CckbH"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+        </script>
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2025
+ xring</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a>
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

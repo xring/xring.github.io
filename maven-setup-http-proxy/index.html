@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Maven 设置 HTTP 代理 | xring&#x27;s blog</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://xring.net/style.css">
+    <link rel="stylesheet" href="https://xring.net/color/orange.css">
+
+        <link rel="stylesheet" href="https://xring.net/color/background_blue.css">
+    
+    <link rel="stylesheet" href="https://xring.net/font-hack-subset.css">
+
+    <meta name="description" content="">
+
+    <meta property="og:description" content="">
+    <meta property="og:title" content="Maven 设置 HTTP 代理 | xring's blog">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://xring.net/maven-setup-http-proxy/">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:title" content="Maven 设置 HTTP 代理 | xring's blog">
+    <meta property="twitter:domain" content="xring.net">
+    <meta property="twitter:url" content="https://xring.net/maven-setup-http-proxy/">
+
+            
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="https://xring.net/atom.xml">
+    
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <meta name="google-adsense-account" content="ca-pub-7408552055522076">
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ksf0q960y1");
+    </script>
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://xring.net" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            xring&#x27;s blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://xring.net">home</a></li>
+            
+                <li><a href="https://xring.net/tags">tags</a></li>
+            
+                <li><a href="https://xring.net/archive">archive</a></li>
+            
+                <li><a href="https://xring.net/about">about</a></li>
+            
+                <li><a href="https://xring.net/atom.xml">rss</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://xring.net/maven-setup-http-proxy/">Maven 设置 HTTP 代理</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2017-02-10
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/java/">#java</a>&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/maven/">#maven</a></span>
+    
+
+        <div class="post-content">
+            <p>有时候基于公司安全因素考虑或者由于一些特殊原因，Maven 无法正常访问外部仓库来下载所需要的资源。这种情况下，可以通过为 Maven 配置 HTTP 代理来解决问题。</p>
+<p>通过以下步骤来为 Maven 配置 HTTP 代理：</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>- 获取 HTTP 代理信息
+</span><span>- 找到 Maven 配置文件 settings.xml
+</span><span>- 将代理信息添加到配置文件
+</span></code></pre>
+<p>假设我们有如下 HTTP 代理信息：</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>host: 9.30.123.123
+</span><span>port: 3712
+</span><span>username: xring
+</span><span>password: volcano
+</span></code></pre>
+<p>下一步来寻找 Maven 配置文件。<code>settimgs.xml</code> 文件可能存在于两个位置：
+– ~/.m2/settings.xml
+– M2_HOME/conf/settings.xml</p>
+<p>如果 <code>~/.m2/settings.xml</code> 文件存在，则 <code>优先</code> 使用这个文件进行配置，如果不存在则需要使用 <code>M2_HOME/conf/settings.xml</code> 文件。如果没有配置 <code>M2_HOME</code> 这个环境变量或者忘记了 Maven 的安装位置，可以通过 <code>mvn -version</code> 可以找到 Maven home 目录，即上面提到的 <code>M2_HOME</code>，在 Mac 下得到类似输出：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">mvn -version
+</span><span style="color:#bf616a;">...
+</span><span style="color:#bf616a;">Maven</span><span> home: /usr/local/Cellar/maven/3.3.9/libexec
+</span><span style="color:#bf616a;">...
+</span></code></pre>
+<p>则 <code>settimgs.xml</code> 文件就在 <code>/usr/local/Cellar/maven/3.3.9/libexec/conf</code> 目录中。</p>
+<p>编辑找到的 settings.xml 文件，搜索 proxies 关键字，找到类似下面的这一段：</p>
+<pre data-lang="xml" style="background-color:#2b303b;color:#c0c5ce;" class="language-xml "><code class="language-xml" data-lang="xml"><span>&lt;</span><span style="color:#bf616a;">proxies</span><span>&gt;
+</span><span>  </span><span style="color:#65737e;">&lt;!-- proxy
+</span><span style="color:#65737e;">   | Specification for one proxy, to be used in connecting to the network.
+</span><span style="color:#65737e;">   |
+</span><span style="color:#65737e;">  &lt;proxy&gt;
+</span><span style="color:#65737e;">    &lt;id&gt;optional&lt;/id&gt;
+</span><span style="color:#65737e;">    &lt;active&gt;true&lt;/active&gt;
+</span><span style="color:#65737e;">    &lt;protocol&gt;http&lt;/protocol&gt;
+</span><span style="color:#65737e;">    &lt;username&gt;proxyuser&lt;/username&gt;
+</span><span style="color:#65737e;">    &lt;password&gt;proxypass&lt;/password&gt;
+</span><span style="color:#65737e;">    &lt;host&gt;proxy.host.net&lt;/host&gt;
+</span><span style="color:#65737e;">    &lt;port&gt;80&lt;/port&gt;
+</span><span style="color:#65737e;">    &lt;nonProxyHosts&gt;local.net|some.host.com&lt;/nonProxyHosts&gt;
+</span><span style="color:#65737e;">  &lt;/proxy&gt;
+</span><span style="color:#65737e;">  --&gt;
+</span><span>&lt;/</span><span style="color:#bf616a;">proxies</span><span>&gt;
+</span></code></pre>
+<p>在 proxies 下可以配置多个 proxy 元素，如果声明了多个 proxy 元素，则默认情况下第一个被激活的 proxy 元素会被使用。
+当 proxy 元素里的 active 被设置为 true 时表示该 proxy 处于激活状态。
+id 字段是 proxy 元素的一个标识
+当代理不需要认证时，username 和 password 可以被注释掉
+nonProxyHost 元素用来指定哪些主机名不需要代理，当有多个主机名不需要代理时用 | 来分隔主机名，主机名里支持通配符（如 *.google.com）。</p>
+<p>了解了这段 XML 各元素的意义后将得到的 HTTP 代理信息依次填入相应元素：</p>
+<pre data-lang="xml" style="background-color:#2b303b;color:#c0c5ce;" class="language-xml "><code class="language-xml" data-lang="xml"><span>&lt;</span><span style="color:#bf616a;">proxies</span><span>&gt;
+</span><span>  &lt;</span><span style="color:#bf616a;">proxy</span><span>&gt;
+</span><span>    &lt;</span><span style="color:#bf616a;">id</span><span>&gt;volcano-proxy&lt;/</span><span style="color:#bf616a;">id</span><span>&gt;
+</span><span>    &lt;</span><span style="color:#bf616a;">active</span><span>&gt;true&lt;/</span><span style="color:#bf616a;">active</span><span>&gt;
+</span><span>    &lt;</span><span style="color:#bf616a;">protocol</span><span>&gt;http&lt;/</span><span style="color:#bf616a;">protocol</span><span>&gt;
+</span><span>    &lt;</span><span style="color:#bf616a;">username</span><span>&gt;xring&lt;/</span><span style="color:#bf616a;">username</span><span>&gt;
+</span><span>    &lt;</span><span style="color:#bf616a;">password</span><span>&gt;volcano&lt;/</span><span style="color:#bf616a;">password</span><span>&gt;
+</span><span>    &lt;</span><span style="color:#bf616a;">host</span><span>&gt;9.30.123.123&lt;/</span><span style="color:#bf616a;">host</span><span>&gt;
+</span><span>    &lt;</span><span style="color:#bf616a;">port</span><span>&gt;3712&lt;/</span><span style="color:#bf616a;">port</span><span>&gt;
+</span><span>    </span><span style="color:#65737e;">&lt;!--
+</span><span style="color:#65737e;">    &lt;nonProxyHosts&gt;local.net|some.host.com&lt;/nonProxyHosts&gt;
+</span><span style="color:#65737e;">    --&gt;
+</span><span>  &lt;/</span><span style="color:#bf616a;">proxy</span><span>&gt;
+</span><span>&lt;/</span><span style="color:#bf616a;">proxies</span><span>&gt;
+</span></code></pre>
+<p>保存 <code>settings.xml</code> 配置文件，Maven 配置 HTTP 代理完成。</p>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Read more</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://xring.net/docker-manually-transfer-image/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Docker 手动迁移镜像</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://xring.net/k8s-pull-images-from-private-registry/">
+                            <span class="button__text">Kubernetes 从私有镜像仓库拉取镜像</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+    <div class="content">
+        <script src="https://giscus.app/client.js"
+        data-repo="xring/blog"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkyNDg0MDg2Mjg="
+        data-category="General"
+        data-category-id="DIC_kwDODs5qNM4CckbH"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+        </script>
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2025
+ xring</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a>
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>
