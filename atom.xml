@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>xring&#x27;s blog</title>
+    <link rel="self" type="application/atom+xml" href="https://xring.net/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://xring.net"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2025-10-28T00:00:00+00:00</updated>
+    <id>https://xring.net/atom.xml</id>
+    <entry xml:lang="en">
+        <title>在 Linux 上运行 ChromeDriver</title>
+        <published>2025-10-28T00:00:00+00:00</published>
+        <updated>2025-10-28T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/run-chromedriver-on-linux/"/>
+        <id>https://xring.net/run-chromedriver-on-linux/</id>
+        
+        <content type="html" xml:base="https://xring.net/run-chromedriver-on-linux/">&lt;p&gt;环境和需求：&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ubuntu Linux 服务器&lt;&#x2F;li&gt;
+&lt;li&gt;Docker 运行业务代码，配置网络 &lt;code&gt;--net host&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;chromedriver&lt;&#x2F;code&gt; 运行在宿主机&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;需要使用 &lt;code&gt;非 headless&lt;&#x2F;code&gt; 模式（有头模式）&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;以 &lt;code&gt;root&lt;&#x2F;code&gt; 运行的业务代码调用 &lt;code&gt;chromedriver&lt;&#x2F;code&gt; 会得到类似提示：&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Running as root without --no-sandbox&#x2F;--headless is not supported.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;这是因为：当业务代码以 root 身份运行时，它通过 &lt;code&gt;chromedriver&lt;&#x2F;code&gt; 启动的 Chrome 浏览器进程也会以 root 身份运行，而 Chrome 不允许以 root 身份运行&lt;&#x2F;p&gt;
+&lt;p&gt;解决方法：&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Docker 中不使用 root 用户：&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;pre data-lang=&quot;Dockerfile&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-Dockerfile &quot;&gt;&lt;code class=&quot;language-Dockerfile&quot; data-lang=&quot;Dockerfile&quot;&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 创建非特权用户
+&lt;&#x2F;span&gt;&lt;span&gt;RUN useradd -m -u 1001 appuser
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 切换到非特权用户
+&lt;&#x2F;span&gt;&lt;span&gt;USER appuser
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 指定工作目录
+&lt;&#x2F;span&gt;&lt;span&gt;WORKDIR &#x2F;home&#x2F;appuser
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;同时在业务代码中按需要添加额外参数（Rust 示例）：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;let mut&lt;&#x2F;span&gt;&lt;span&gt; caps = DesiredCapabilities::chrome();
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;caps.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;add_arg&lt;&#x2F;span&gt;&lt;span&gt;(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;--no-sandbox&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;).&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;ok&lt;&#x2F;span&gt;&lt;span&gt;()?; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 禁用沙箱
+&lt;&#x2F;span&gt;&lt;span&gt;caps.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;add_arg&lt;&#x2F;span&gt;&lt;span&gt;(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;--disable-dev-shm-usage&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;).&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;ok&lt;&#x2F;span&gt;&lt;span&gt;()?; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 禁用 &#x2F;dev&#x2F;shm 使用
+&lt;&#x2F;span&gt;&lt;span&gt;caps.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;add_arg&lt;&#x2F;span&gt;&lt;span&gt;(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;--disable-gpu&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;).&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;ok&lt;&#x2F;span&gt;&lt;span&gt;()?; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 禁用 GPU
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;在终端下启动 &lt;code&gt;chromedriver&lt;&#x2F;code&gt; 会得到类似提示：&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Missing X server or $DISPLAY&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;需要在图形界面&#x2F;桌面 上，启动 &lt;code&gt;chromedriver&lt;&#x2F;code&gt;，在启动前可以使用 &lt;code&gt;echo $DISPLAY&lt;&#x2F;code&gt; 来确认。&lt;&#x2F;p&gt;
+&lt;p&gt;或者使用 &lt;code&gt;Xvfb&lt;&#x2F;code&gt; 技术，Xvfb 会创建一个内存中的虚拟屏幕，ChromeDriver 可以在这个虚拟屏幕上运行有头模式的 Chrome 浏览器，就像在一个真正的桌面上一样，但实际上不会有任何窗口弹出。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>将 Apple Watch 迁移到新 iPhone</title>
+        <published>2025-09-25T00:00:00+00:00</published>
+        <updated>2025-09-25T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/transfer-apple-watch-to-new-iphone/"/>
+        <id>https://xring.net/transfer-apple-watch-to-new-iphone/</id>
+        
+        <content type="html" xml:base="https://xring.net/transfer-apple-watch-to-new-iphone/">&lt;p&gt;从旧 iPhone 传输数据到新 iPhone 后，Apple Watch 的绑定关系没有一起传输过来，此时需要在旧的 iPhone 设备上进入 watch 应用，将手表进行 &lt;code&gt;解除绑定&lt;&#x2F;code&gt;，然后才能在新的 iPhone 设备上进行重新绑定。&lt;&#x2F;p&gt;
+&lt;p&gt;重新绑定时，选择 &lt;code&gt;从备份恢复&lt;&#x2F;code&gt;。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Rust 中的 LazyLock 和 OnceLock</title>
+        <published>2025-01-02T00:00:00+00:00</published>
+        <updated>2025-01-02T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/lazylock-and-once-lock-in-rust/"/>
+        <id>https://xring.net/lazylock-and-once-lock-in-rust/</id>
+        
+        <content type="html" xml:base="https://xring.net/lazylock-and-once-lock-in-rust/">&lt;p&gt;&lt;code&gt;LazyLock&lt;&#x2F;code&gt; 和 &lt;code&gt;OnceLock&lt;&#x2F;code&gt; 是 Rust 中用于实现惰性初始化的两种不同的锁机制。它们都可以用于延迟初始化某个值，直到第一次访问时才进行计算和存储。它们被视为对 &lt;code&gt;lazy_static&lt;&#x2F;code&gt; 和 &lt;code&gt;once_cell&lt;&#x2F;code&gt; 的现代替代方案，提供了更简洁和类型安全的接口。&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;use &lt;&#x2F;span&gt;&lt;span&gt;std::sync::LazyLock;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;static &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;CONFIG&lt;&#x2F;span&gt;&lt;span&gt;: LazyLock&amp;lt;String&amp;gt; = LazyLock::new(|| {
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 运行时初始化逻辑
+&lt;&#x2F;span&gt;&lt;span&gt;    println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Initializing CONFIG...&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;);
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Runtime configuration&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;to_string&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;});
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;main&lt;&#x2F;span&gt;&lt;span&gt;() {
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 第一次访问时进行初始化
+&lt;&#x2F;span&gt;&lt;span&gt;    println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Config: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;, *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;CONFIG&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 再次访问时不会重新初始化
+&lt;&#x2F;span&gt;&lt;span&gt;    println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Config: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;, *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;CONFIG&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;code&gt;Initializing CONFIG...&lt;&#x2F;code&gt; 的内容只会被打印一次。&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;use &lt;&#x2F;span&gt;&lt;span&gt;std::sync::OnceLock;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;static &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;CONFIG&lt;&#x2F;span&gt;&lt;span&gt;: OnceLock&amp;lt;String&amp;gt; = OnceLock::new();
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;main&lt;&#x2F;span&gt;&lt;span&gt;() {
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 第一次调用 get_or_init 时进行初始化
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; config = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;CONFIG&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;get_or_init&lt;&#x2F;span&gt;&lt;span&gt;(|| {
+&lt;&#x2F;span&gt;&lt;span&gt;        println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Initializing CONFIG...&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;);
+&lt;&#x2F;span&gt;&lt;span&gt;        &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Runtime configuration&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;to_string&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    });
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Config: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;, config);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;&#x2F; 再次调用 get_or_init 时不会重新初始化
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; config_again = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;CONFIG&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;get_or_init&lt;&#x2F;span&gt;&lt;span&gt;(|| {
+&lt;&#x2F;span&gt;&lt;span&gt;        println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;This will not be printed.&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;);
+&lt;&#x2F;span&gt;&lt;span&gt;        &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Another configuration&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;to_string&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    });
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Config again: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;, config_again);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;在已初始化的值上多次调用 &lt;code&gt;get_or_init&lt;&#x2F;code&gt; 不会重新初始化。&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;LazyLock&lt;&#x2F;code&gt;&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;线程安全性: LazyLock 使用内部的同步机制来确保初始化逻辑只会执行一次，即使在多个线程同时访问的情况下。它通常用于全局静态变量的惰性初始化。&lt;&#x2F;li&gt;
+&lt;li&gt;使用场景: 适合在程序启动时就能确定初始化逻辑的场景，尤其是全局静态变量。&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;code&gt;OnceLock&lt;&#x2F;code&gt;&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;线程安全性: OnceLock 也使用同步机制来确保初始化逻辑只会执行一次。它提供了一个简单的 API 来在运行时进行初始化。&lt;&#x2F;li&gt;
+&lt;li&gt;使用场景: 适合需要在运行时初始化的场景，尤其是在需要确保某个值只被初始化一次的情况下。&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>2024 总结</title>
+        <published>2024-12-31T00:00:00+00:00</published>
+        <updated>2024-12-31T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/2024-summary/"/>
+        <id>https://xring.net/2024-summary/</id>
+        
+        <content type="html" xml:base="https://xring.net/2024-summary/">&lt;p&gt;今天最后一天了，水一个年终总结。2024算是一个 &lt;code&gt;gap year&lt;&#x2F;code&gt;了，给自己放松了差不多三个月的时间，做了一些思考，也尝试了一些之前从未试过的东西。&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;gong-zuo-fang-mian&quot;&gt;工作方面&lt;&#x2F;h2&gt;
+&lt;p&gt;掰手指算了一下，“创业”第六年了。在这个团队里有过太多的从0到1，有过太多的造轮子。早几天跟小伙伴们聊起了从追求一个9到两个9到三个9，从网关 rt 500ms 到 80ms，也算是“小有成就”了。&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;tuan-dui-jian-she&quot;&gt;团队建设&lt;&#x2F;h3&gt;
+&lt;p&gt;作为年轻人聚集地，咱们还是比较稳的。今年有一位后端小伙伴离开，有一位之前离职的测试小伙伴回归。极度扁平，基本不需要团队管理。大家都在自己的位置做自己的事，吃着老板画的饼，大概都在想着明年会不一样吧。&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;bian-cheng-yu-yan&quot;&gt;编程语言&lt;&#x2F;h3&gt;
+&lt;p&gt;和去年一样，Rust 依然是使用得最多的。今年把几个基础服务从 Go &#x2F; Java 迁移到了 Rust，我一人一服务，从0到1，管它是不是轮子，能用就好，开心最重要。前端一如既往的烂，倒是尝试学习了一下 TypeScript，没有太多使用场景。然后复习了一下 Python 相关的，写了一些调用大模型的胶水代码。&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;xi-tong-jia-gou&quot;&gt;系统架构&lt;&#x2F;h3&gt;
+&lt;p&gt;现在回想一下，在18年底就 all in 了 K8S 和 Istio，创业团队没有历史包袱还是舒服的。管它有没有坑，管它会不会，先上了再说。虽说一路踩坑填坑无数，但这玩意儿对于中小团队来说，走过一次基本到处可用了。&lt;&#x2F;p&gt;
+&lt;p&gt;今年在系统架构层面没有太多变更，基础服务有的变动只有配置中心从 etcd 切换到了更轻量的自己造的轮子。春节假期后会做一些 K8S 和 Istio 的升级工作。&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;ai-he-llm&quot;&gt;AI 和 LLM&lt;&#x2F;h3&gt;
+&lt;p&gt;内部使用的类 ChatGPT 平台经过了多次升级，陆续添加了 OpenAI、Claude、Gemini、DeepSeek 的支持，一年用掉了5000多美刀，看起来还是提升了效率的。&lt;&#x2F;p&gt;
+&lt;p&gt;业务层面接入大模型也终于在下半年启动了，目前有两个场景在尝试中，更多的在路上。&lt;&#x2F;p&gt;
+&lt;p&gt;自己也尝试在借用 AI 和 LLM 相关的做一些独立开发，希望能在明年发布一款自己从需求开始的产品吧。&lt;&#x2F;p&gt;
+&lt;p&gt;近期比较多的精力在这一块了，做一些积累，计划明年在这块能有更多的产出。&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;gong-ju&quot;&gt;工具&lt;&#x2F;h3&gt;
+&lt;p&gt;单独说一说 &lt;a href=&quot;https:&#x2F;&#x2F;wakatime.com&#x2F;@xring&quot;&gt;WakaTime&lt;&#x2F;a&gt; 吧，一个记录“时间”的工作，个人觉得我还挺受用的。&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;sheng-huo-fang-mian&quot;&gt;生活方面&lt;&#x2F;h2&gt;
+&lt;p&gt;先说说孩子，三岁了，10月份出生的，关于是否上幼儿园的问题跟家里人有一些争执，还是决定晚一些再上幼儿园。春节过后有一次比较严重的生病，去住了几天院，万幸恢复的较好。关于孩子的教育，我个人承行快乐教育，在最近购置了帐篷天幕等装备，希望能坚持户外陪伴。&lt;&#x2F;p&gt;
+&lt;p&gt;然后说说媳妇儿，今年下半年换了工作，是她想要的“稳定”的工作。收入水平有所降低，但不重要，她开心就好了。另一个角度是有更多的时间陪孩子了。&lt;&#x2F;p&gt;
+&lt;p&gt;父母身体状态良好，这个最重要。下半年给父母安排了一场北京游，给我爹安排了心心念念梅兰芳大剧院看京剧。明年上半年需要再安排一次全面体检了。相比父母辈，祖父母、外祖父母辈身体状态较多，也给我妈整的有些憔悴，此处有些槽点...&lt;&#x2F;p&gt;
+&lt;p&gt;自己在生活上没有太多的变化，夏天有过一段时间的健身，没能每天坚持。唯一值得一提的是把英语学习当成了生活的一部分吧，在 Cambly 上了大概 83 节一对一的课，2500多分钟吧，口语能力有一些提升，明年需要更多的坚持。&lt;&#x2F;p&gt;
+&lt;p&gt;今年给自己差不多放了三个月的假，想清了一些东西，也甩掉了一些标签。如果要做个总结，那大概就是 &lt;code&gt;做更好的自己&lt;&#x2F;code&gt; 吧。然后希望明年的总结有更多的内容可以写下。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Mac 平台交叉编译 Rust 至 Linux 平台</title>
+        <published>2024-10-21T00:00:00+00:00</published>
+        <updated>2024-10-21T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/cross-compiling-rust-from-mac-to-linux/"/>
+        <id>https://xring.net/cross-compiling-rust-from-mac-to-linux/</id>
+        
+        <content type="html" xml:base="https://xring.net/cross-compiling-rust-from-mac-to-linux/">&lt;p&gt;最近在用 Rust 开发一些提效小工具，在 Mac 平台编码但运行环境为 Linux（裸跑，非容器），将相关过程记录一下。&lt;&#x2F;p&gt;
+&lt;p&gt;之前这种跨平台的编译是使用 &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cross-rs&#x2F;cross&quot;&gt;cross&lt;&#x2F;a&gt; 来完成的，使用类似下面的命令来进行编译：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;cross&lt;&#x2F;span&gt;&lt;span&gt; build&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; --release --target&lt;&#x2F;span&gt;&lt;span&gt; x86_64-unknown-linux-gnu
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;本次直接用 cargo 来解决：&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用 &lt;code&gt;rustup target add&lt;&#x2F;code&gt; 来添加目标平台的标准库&lt;&#x2F;li&gt;
+&lt;li&gt;安装目标平台的 &lt;code&gt;链接器（linker）&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;配置 cargo 来使 &lt;code&gt;rustc&lt;&#x2F;code&gt; 能够使用正确的链接器&lt;&#x2F;li&gt;
+&lt;li&gt;设置 &lt;code&gt;TARGET_CC&lt;&#x2F;code&gt; 环境变量&lt;&#x2F;li&gt;
+&lt;li&gt;使用 &lt;code&gt;cargo build&lt;&#x2F;code&gt; 来进行编译&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;tian-jia-mu-biao-target&quot;&gt;添加目标 target&lt;&#x2F;h2&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;rustup&lt;&#x2F;span&gt;&lt;span&gt; target add x86_64-unknown-linux-gnu
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;an-zhuang-mu-biao-ping-tai-de-lian-jie-qi&quot;&gt;安装目标平台的链接器&lt;&#x2F;h2&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;brew&lt;&#x2F;span&gt;&lt;span&gt; install SergioBenitez&#x2F;osxct&#x2F;x86_64-unknown-linux-gnu
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;tian-jia-cargo-pei-zhi-wen-jian&quot;&gt;添加 cargo 配置文件&lt;&#x2F;h2&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span&gt; .cargo
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;touch&lt;&#x2F;span&gt;&lt;span&gt; config.toml
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;添加下面的配置文件：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[target.x86_64-unknown-linux-gnu]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;linker &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;x86_64-unknown-linux-gnu-gcc&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;she-zhi-huan-jing-bian-liang&quot;&gt;设置环境变量&lt;&#x2F;h2&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;export &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;TARGET_CC&lt;&#x2F;span&gt;&lt;span&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;x86_64-unknown-linux-gnu-gcc
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;kai-shi-bian-yi&quot;&gt;开始编译&lt;&#x2F;h2&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;cargo&lt;&#x2F;span&gt;&lt;span&gt; build&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; --release --target&lt;&#x2F;span&gt;&lt;span&gt; x86_64-unknown-linux-gnu
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;设置环境变量和编译可以在同一步进行：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;TARGET_CC&lt;&#x2F;span&gt;&lt;span&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;x86_64-unknown-linux-gnu-gcc &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;cargo&lt;&#x2F;span&gt;&lt;span&gt; build&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; --release --target&lt;&#x2F;span&gt;&lt;span&gt; x86_64-unknown-linux-gnu
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后在 &lt;code&gt;.&#x2F;target&#x2F;x86_64-unknown-linux-gnu&#x2F;release&#x2F;&lt;&#x2F;code&gt; 可以找到编译产物。&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;yun-xing-huan-jing-glibc-ban-ben-guo-di-wen-ti&quot;&gt;运行环境 glibc 版本过低问题&lt;&#x2F;h2&gt;
+&lt;p&gt;当在运行环境执行 &lt;code&gt;.&#x2F;tool-name&lt;&#x2F;code&gt; 时，部分服务器报错了：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;.&#x2F;tool-name:&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;lib64&#x2F;libc.so.6: version GLIBC_2.25&amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt; not found (required by .&#x2F;tool-name)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;查看 ldd 版本：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;ldd --version
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;ldd&lt;&#x2F;span&gt;&lt;span&gt; (GNU libc) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;2.17
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;Copyright&lt;&#x2F;span&gt;&lt;span&gt; (C) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;2012&lt;&#x2F;span&gt;&lt;span&gt; Free Software Foundation, Inc.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;这是因为 &lt;code&gt;glibc&lt;&#x2F;code&gt; 版本较低（部分服务器运行好多年了，一直未替换），此时可以升级版本或者使用静态链接方案。升级版本考虑的问题比较多，下面继续看使用静态链接来编译。&lt;&#x2F;p&gt;
+&lt;p&gt;当 target 是 &lt;code&gt;x86_64-unknown-linux-gnu&lt;&#x2F;code&gt; 时，会使用&lt;code&gt;动态链接&lt;&#x2F;code&gt;，也就是在运行时来链接。因此会出现运行环境 glibc 版本不满足要求的情况。换用 &lt;code&gt;x86_64-unknown-linux-musl&lt;&#x2F;code&gt; 这个目标平台来解决问题。&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 添加目标平台
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;rustup&lt;&#x2F;span&gt;&lt;span&gt; target add x86_64-unknown-linux-musl
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 安装链接器
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;brew&lt;&#x2F;span&gt;&lt;span&gt; install FiloSottile&#x2F;musl-cross&#x2F;musl-cross
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后在 cargo 配置文件 &lt;code&gt;.cargo&#x2F;config.toml&lt;&#x2F;code&gt; 中添加如下内容：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[target.x86_64-unknown-linux-musl]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;linker &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;x86_64-linux-musl-gcc&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# -static-pie 如果不支持，则再添加下面这一行
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# rustflags = [&amp;quot;-C&amp;quot;, &amp;quot;link-args=-static&amp;quot;]
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;最后执行编译：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;TARGET_CC&lt;&#x2F;span&gt;&lt;span&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;x86_64-linux-musl-gcc &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;cargo&lt;&#x2F;span&gt;&lt;span&gt; build&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; --release --target&lt;&#x2F;span&gt;&lt;span&gt; x86_64-unknown-linux-musl
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;在 &lt;code&gt;.&#x2F;target&#x2F;x86_64-unknown-linux-musl&#x2F;release&#x2F;&lt;&#x2F;code&gt; 可以找到编译产物。这样得到的可执行文件就是通过静态链接的了，应该在大部分的 Linux 上都可以执行。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>在 Cargo 项目中使用 git 仓库作为依赖</title>
+        <published>2024-03-28T00:00:00+00:00</published>
+        <updated>2024-03-28T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/cargo-dependencies-from-git/"/>
+        <id>https://xring.net/cargo-dependencies-from-git/</id>
+        
+        <content type="html" xml:base="https://xring.net/cargo-dependencies-from-git/">&lt;p&gt;在 Cargo 项目中，最简单的依赖方式为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;serde &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;这会直接使用 &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;&quot;&gt;crates.io&lt;&#x2F;a&gt; 的依赖和版本，某些时候可能需要从源码仓库直接依赖某个分支或者依赖未发布到 &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;&quot;&gt;crates.io&lt;&#x2F;a&gt; 。此时，最小化的配置为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;regex &lt;&#x2F;span&gt;&lt;span&gt;= { &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;regex.git&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot; }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;如果需要指定分支，可以配置为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;regex &lt;&#x2F;span&gt;&lt;span&gt;= { &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;regex.git&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;branch &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;next&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot; }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;上面两种使用基于 HTTPS 的认证，如果项目是非开仓库，需要进行额外配置，参考&lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;cargo&#x2F;appendix&#x2F;git-authentication.html#https-authentication&quot;&gt;这里&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;另外一种是基于 SSH 的认证，此时相关配置格式为：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;toml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-toml &quot;&gt;&lt;code class=&quot;language-toml&quot; data-lang=&quot;toml&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;regex &lt;&#x2F;span&gt;&lt;span&gt;= { &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git &lt;&#x2F;span&gt;&lt;span&gt;= &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;ssh:&#x2F;&#x2F;git@example.com&#x2F;user&#x2F;repo.git&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot; }
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;基于 SSH 的认证要求 &lt;code&gt;ssh-agent&lt;&#x2F;code&gt;，可以使用下面的方式快速添加：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# 注意 SSH 的私钥位置
+&lt;&#x2F;span&gt;&lt;span&gt;ssh-add ~&#x2F;.ssh&#x2F;id_rsa
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;使用 &lt;code&gt;ssh-add -l&lt;&#x2F;code&gt; 来确认密钥已经成功添加到 &lt;code&gt;ssh-agent&lt;&#x2F;code&gt;。&lt;&#x2F;p&gt;
+&lt;p&gt;如果 SSH 密钥是有密码的，这个步骤需要输入密码。通过 &lt;code&gt;ssh-agent&lt;&#x2F;code&gt; 后续 Cargo 访问私仓时将不需要输入密码。&lt;&#x2F;p&gt;
+&lt;p&gt;当 Git 仓库中的代码更新了，使用以下命令来更新本地依赖的代码：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;cargo update
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>使用 Gmail 实现域名邮箱收发功能</title>
+        <published>2023-04-06T00:00:00+00:00</published>
+        <updated>2023-04-06T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/send-receive-email-with-cf-gmail-and-custom-domain/"/>
+        <id>https://xring.net/send-receive-email-with-cf-gmail-and-custom-domain/</id>
+        
+        <content type="html" xml:base="https://xring.net/send-receive-email-with-cf-gmail-and-custom-domain/">&lt;p&gt;业界良心 Cloudflare 提供了很多实用的功能，其中之一就是 Email Routing，可以用来便捷的将自定义域名邮箱收到的邮件转发到某个目标邮箱。再配合上 Gmail 的一些设置，即可以轻松实现使用 Gmail 来收和发域名邮箱的邮件。&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;域名需要在 Cloudflare 或者使用 Cloudflare 的 Nameserver&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;h2 id=&quot;shou-you-jian&quot;&gt;收邮件&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;在 Cloudflare 的控制台，选择配置 Email --&amp;gt; Email Routing --&amp;gt; Routes&lt;&#x2F;li&gt;
+&lt;li&gt;添加 自定义邮箱地址 xx@yy.com&lt;&#x2F;li&gt;
+&lt;li&gt;然后选择转发的&lt;code&gt;目标邮箱地址&lt;&#x2F;code&gt;即可。&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;可以在 Destination addresses 处添加多个 目标邮箱地址。目标邮箱地址在第一次添加时需要进行验证操作。&lt;&#x2F;p&gt;
+&lt;p&gt;通过上面的配置，发送到 xx@yy.com 的邮件会被转发到配置的 目标邮箱地址，但是在 Gmail 回复邮件的时候仍然使用 目标邮箱地址。需要继续下面的配置才能将回信发件人地址修改为 xx@yy.com。&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;fa-you-jian&quot;&gt;发邮件&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;需要 Gmail 开启了 2FA，https:&#x2F;&#x2F;myaccount.google.com&#x2F;signinoptions&#x2F;two-step-verification&lt;&#x2F;li&gt;
+&lt;li&gt;创建一个 Gmail 的 App 密码，https:&#x2F;&#x2F;security.google.com&#x2F;settings&#x2F;security&#x2F;apppasswords 分别选择 Mail 和 Mac 两个选项后生成，得到密码 &lt;code&gt;ABC&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;在 Gmail 页面，打开 see all settings --&amp;gt; Accounts and Import --&amp;gt; Send mail as --&amp;gt; add another email address&lt;&#x2F;li&gt;
+&lt;li&gt;填写表单的第一步 Email Address 填写 xx@yy.com，即自定义域名邮箱&lt;&#x2F;li&gt;
+&lt;li&gt;填写表单的第二步 SMTP Server 填写 http:&#x2F;&#x2F;smtp.gmail.com，用户名填写 gmail 邮箱地址，密码填写上面得到的 ABC&lt;&#x2F;li&gt;
+&lt;li&gt;添加账户，然后在写信或者回信时就可以选择 xx@yy.com&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;也可以在 Send mail as 处勾选 &lt;code&gt;Reply from the same address the message was sent to&lt;&#x2F;code&gt; 这样回信的时候就默认使用收信的地址了。&lt;&#x2F;p&gt;
+&lt;p&gt;配置好上面两个部分，就完成了使用 Gmail 来收和发域名邮箱的邮件。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Xcode 15.2 安装 iOS_17.2_Simulator</title>
+        <published>2023-01-23T00:00:00+00:00</published>
+        <updated>2023-01-23T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/xcode-15-2-install-ios-17-2-simulator/"/>
+        <id>https://xring.net/xcode-15-2-install-ios-17-2-simulator/</id>
+        
+        <content type="html" xml:base="https://xring.net/xcode-15-2-install-ios-17-2-simulator/">&lt;p&gt;更新 Xcode 到 15.2 之后，需要安装iOS_17.2_Simulator，但是在 Xcode 里下载总是网络错误，或者下载卡在 99% 的地方，可以用如下步骤来手动安装。&lt;&#x2F;p&gt;
+&lt;p&gt;打开官网 &lt;a href=&quot;https:&#x2F;&#x2F;developer.apple.com&#x2F;download&#x2F;all&#x2F;?q=ios&quot;&gt;https:&#x2F;&#x2F;developer.apple.com&#x2F;download&#x2F;all&#x2F;?q=ios&lt;&#x2F;a&gt;，登录后选择下载 &lt;code&gt;iOS 17.2 Simulator Runtime.dmg&lt;&#x2F;code&gt; 文件。&lt;&#x2F;p&gt;
+&lt;p&gt;假设文件存储到 &lt;code&gt;~&#x2F;Downloads&lt;&#x2F;code&gt;，在终端依次执行下面的命令：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 下面这条命令需要输入密码
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;sudo&lt;&#x2F;span&gt;&lt;span&gt; xcode-select&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -s&lt;&#x2F;span&gt;&lt;span&gt; &#x2F;Applications&#x2F;Xcode.app
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;xcodebuild -runFirstLaunch 
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 需要替换为自己的路径，下面这条命令需要一些时间来执行
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 执行完成终端会有输出，且会弹窗提示 &amp;quot;Verifying...&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;xcrun&lt;&#x2F;span&gt;&lt;span&gt; simctl runtime add &amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&#x2F;Users&#x2F;xring&#x2F;Downloads&#x2F;iOS_17.2_Simulator_Runtime.dmg&lt;&#x2F;span&gt;&lt;span&gt;&amp;#39;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后在 Xcode 就可以看到 iOS_17.2_Simulator 了。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>博客迁移至 Zola</title>
+        <published>2023-01-21T00:00:00+00:00</published>
+        <updated>2023-01-21T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/blog-upgraded-to-zola/"/>
+        <id>https://xring.net/blog-upgraded-to-zola/</id>
+        
+        <content type="html" xml:base="https://xring.net/blog-upgraded-to-zola/">&lt;p&gt;从19年参与“创业”至今，已经很长时间没有停下来做一些思考和总结了，也有很长时间没有将学的知识、踩的坑、买的教训等等来沉淀一下。TODO 里面记录了很多想要系统学习的内空，有书籍有视频有博客等等，很多时间脑子懂了不代表手懂了，那就多做一些记录吧。&lt;&#x2F;p&gt;
+&lt;p&gt;于是，博客迁移到 Rust 实现的 &lt;a href=&quot;https:&#x2F;&#x2F;www.getzola.org&#x2F;&quot;&gt;Zola&lt;&#x2F;a&gt;，选择了一个简单的主题 &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pawroman&#x2F;zola-theme-terminimal&quot;&gt;terminimal&lt;&#x2F;a&gt;，主题参照 &lt;a href=&quot;https:&#x2F;&#x2F;heitorpb.github.io&#x2F;&quot;&gt;Heitor&#x27;s Log&lt;&#x2F;a&gt; 进行了简单的装修 ，再搭配了一个基于 GitHub Discussions 的评论系统 &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;apps&#x2F;giscus&quot;&gt;giscus&lt;&#x2F;a&gt;。基本就可以用起来了，等需要的时候再去折腾一下图床，就可以用来承载内容了。&lt;&#x2F;p&gt;
+&lt;p&gt;站点美容告一段落，希望每个月至少有两篇输出吧。&lt;&#x2F;p&gt;
+&lt;p&gt;自勉。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Istio 中配置 Envoy 获取 Client 真实 IP</title>
+        <published>2019-03-22T00:00:00+00:00</published>
+        <updated>2019-03-22T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/istio-gateway-get-client-ip/"/>
+        <id>https://xring.net/istio-gateway-get-client-ip/</id>
+        
+        <content type="html" xml:base="https://xring.net/istio-gateway-get-client-ip/">&lt;p&gt;背景：使用 Istio Ingress Gateway(Envoy)，需要获取客户端真实 IP 地址&lt;&#x2F;p&gt;
+&lt;p&gt;使用 Helm 安装 Istio 会安装一个名为 &lt;code&gt;istio-ingressgateway&lt;&#x2F;code&gt; 的 Service，类型为 &lt;code&gt;LoadBalancer&lt;&#x2F;code&gt;，可以将服务暴露到公网。 &lt;&#x2F;p&gt;
+&lt;p&gt;这个 Service 的 &lt;code&gt;spec.externalTrafficPolicy&lt;&#x2F;code&gt; 默认值是 &lt;code&gt;Cluster&lt;&#x2F;code&gt;，我们只要将这个值更新为&lt;code&gt;Local&lt;&#x2F;code&gt;，就可以在 &lt;code&gt;X-Forwarded-For&lt;&#x2F;code&gt; 请求头获取到客户端真实 IP 地址了。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Kubernetes 从私有镜像仓库拉取镜像</title>
+        <published>2019-01-11T00:00:00+00:00</published>
+        <updated>2019-01-11T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/k8s-pull-images-from-private-registry/"/>
+        <id>https://xring.net/k8s-pull-images-from-private-registry/</id>
+        
+        <content type="html" xml:base="https://xring.net/k8s-pull-images-from-private-registry/">&lt;p&gt;在企业内部使用 private registry 来存储私有镜像显然是必需的，本例的私仓使用 &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;goharbor&#x2F;harbor&quot;&gt;Harbor&lt;&#x2F;a&gt;，下面来看看在 Kubernetes 集群中怎么配置使用我们建立的私有镜像仓库。假设私有镜像仓库地址为：&lt;code&gt;https:&#x2F;&#x2F;hub.xring.info&lt;&#x2F;code&gt;，我们要用的镜像为 nginx:v0.1.0，存在仓库 mynginx 中。如果使用 docker pull 来拉取镜像则命令为：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;docker pull hub.xring.info&#x2F;mynginx&#x2F;nginx:v0.1.0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;为了在 Kubernetes 中使用私有镜像仓库，我们需要做两个事：&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;创建一个存储了私有镜像 credential 信息的 Secret 资源对象&lt;&#x2F;li&gt;
+&lt;li&gt;在 Pod 创建模板使用 spec.imagePullSecrets 中指定创建的 Secret 对象&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;!--more--&gt;
+&lt;h3 id=&quot;chuang-jian-secret-zi-yuan-dui-xiang&quot;&gt;创建 Secret 资源对象&lt;&#x2F;h3&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;kubectl create secret docker-registry my-hub-secret --docker-server=hub.xring.info --docker-username=xbot --docker-password=123456 --docker-email=xbot@xring.info
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;zhi-ding-secret-dui-xiang&quot;&gt;指定 Secret 对象&lt;&#x2F;h3&gt;
+&lt;p&gt;以下面的 Pod 资源定义为例：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;yml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-yml &quot;&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;apiVersion&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;v1
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;kind&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Pod
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;metadata&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;nginx-v010
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;labels&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;app&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;nginx-v010
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;spec&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;imagePullSecrets&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  - &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;my-hub-secret
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;containers&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;  - &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;image&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;hub.xring.info&#x2F;mynginx&#x2F;nginx:v0.1.0
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;nginx-v010
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后再使用 &lt;code&gt;kubectl apply -f mynginx.yaml&lt;&#x2F;code&gt; 来创建 Pod 对象，就可以从私有镜像仓库中拉取镜像了。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Maven 设置 HTTP 代理</title>
+        <published>2017-02-10T00:00:00+00:00</published>
+        <updated>2017-02-10T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/maven-setup-http-proxy/"/>
+        <id>https://xring.net/maven-setup-http-proxy/</id>
+        
+        <content type="html" xml:base="https://xring.net/maven-setup-http-proxy/">&lt;p&gt;有时候基于公司安全因素考虑或者由于一些特殊原因，Maven 无法正常访问外部仓库来下载所需要的资源。这种情况下，可以通过为 Maven 配置 HTTP 代理来解决问题。&lt;&#x2F;p&gt;
+&lt;p&gt;通过以下步骤来为 Maven 配置 HTTP 代理：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;- 获取 HTTP 代理信息
+&lt;&#x2F;span&gt;&lt;span&gt;- 找到 Maven 配置文件 settings.xml
+&lt;&#x2F;span&gt;&lt;span&gt;- 将代理信息添加到配置文件
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;假设我们有如下 HTTP 代理信息：&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;host: 9.30.123.123
+&lt;&#x2F;span&gt;&lt;span&gt;port: 3712
+&lt;&#x2F;span&gt;&lt;span&gt;username: xring
+&lt;&#x2F;span&gt;&lt;span&gt;password: volcano
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;下一步来寻找 Maven 配置文件。&lt;code&gt;settimgs.xml&lt;&#x2F;code&gt; 文件可能存在于两个位置：
+– ~&#x2F;.m2&#x2F;settings.xml
+– M2_HOME&#x2F;conf&#x2F;settings.xml&lt;&#x2F;p&gt;
+&lt;p&gt;如果 &lt;code&gt;~&#x2F;.m2&#x2F;settings.xml&lt;&#x2F;code&gt; 文件存在，则 &lt;code&gt;优先&lt;&#x2F;code&gt; 使用这个文件进行配置，如果不存在则需要使用 &lt;code&gt;M2_HOME&#x2F;conf&#x2F;settings.xml&lt;&#x2F;code&gt; 文件。如果没有配置 &lt;code&gt;M2_HOME&lt;&#x2F;code&gt; 这个环境变量或者忘记了 Maven 的安装位置，可以通过 &lt;code&gt;mvn -version&lt;&#x2F;code&gt; 可以找到 Maven home 目录，即上面提到的 &lt;code&gt;M2_HOME&lt;&#x2F;code&gt;，在 Mac 下得到类似输出：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;mvn -version
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;Maven&lt;&#x2F;span&gt;&lt;span&gt; home: &#x2F;usr&#x2F;local&#x2F;Cellar&#x2F;maven&#x2F;3.3.9&#x2F;libexec
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;则 &lt;code&gt;settimgs.xml&lt;&#x2F;code&gt; 文件就在 &lt;code&gt;&#x2F;usr&#x2F;local&#x2F;Cellar&#x2F;maven&#x2F;3.3.9&#x2F;libexec&#x2F;conf&lt;&#x2F;code&gt; 目录中。&lt;&#x2F;p&gt;
+&lt;p&gt;编辑找到的 settings.xml 文件，搜索 proxies 关键字，找到类似下面的这一段：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;xml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-xml &quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&amp;lt;!-- proxy
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;   | Specification for one proxy, to be used in connecting to the network.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;  &amp;lt;proxy&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;id&amp;gt;optional&amp;lt;&#x2F;id&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;active&amp;gt;true&amp;lt;&#x2F;active&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;protocol&amp;gt;http&amp;lt;&#x2F;protocol&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;username&amp;gt;proxyuser&amp;lt;&#x2F;username&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;password&amp;gt;proxypass&amp;lt;&#x2F;password&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;host&amp;gt;proxy.host.net&amp;lt;&#x2F;host&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;port&amp;gt;80&amp;lt;&#x2F;port&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;nonProxyHosts&amp;gt;local.net|some.host.com&amp;lt;&#x2F;nonProxyHosts&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;  &amp;lt;&#x2F;proxy&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;  --&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;在 proxies 下可以配置多个 proxy 元素，如果声明了多个 proxy 元素，则默认情况下第一个被激活的 proxy 元素会被使用。
+当 proxy 元素里的 active 被设置为 true 时表示该 proxy 处于激活状态。
+id 字段是 proxy 元素的一个标识
+当代理不需要认证时，username 和 password 可以被注释掉
+nonProxyHost 元素用来指定哪些主机名不需要代理，当有多个主机名不需要代理时用 | 来分隔主机名，主机名里支持通配符（如 *.google.com）。&lt;&#x2F;p&gt;
+&lt;p&gt;了解了这段 XML 各元素的意义后将得到的 HTTP 代理信息依次填入相应元素：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;xml&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-xml &quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxy&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;id&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;volcano-proxy&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;id&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;active&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;true&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;active&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;protocol&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;http&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;protocol&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;username&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;xring&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;username&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;password&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;volcano&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;password&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;host&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;9.30.123.123&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;host&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;port&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;3712&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;port&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&amp;lt;!--
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    &amp;lt;nonProxyHosts&amp;gt;local.net|some.host.com&amp;lt;&#x2F;nonProxyHosts&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;    --&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxy&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;proxies&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;保存 &lt;code&gt;settings.xml&lt;&#x2F;code&gt; 配置文件，Maven 配置 HTTP 代理完成。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Docker 手动迁移镜像</title>
+        <published>2017-02-02T00:00:00+00:00</published>
+        <updated>2017-02-02T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              xring
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://xring.net/docker-manually-transfer-image/"/>
+        <id>https://xring.net/docker-manually-transfer-image/</id>
+        
+        <content type="html" xml:base="https://xring.net/docker-manually-transfer-image/">&lt;p&gt;使用公共或者私有的 Registry 可以方便的将 Docker 镜像进行转移，在某些场景可能期望手动来迁移镜像。&lt;&#x2F;p&gt;
+&lt;p&gt;此时可以使用 &lt;code&gt;docker save&lt;&#x2F;code&gt; 和 &lt;code&gt;docker load&lt;&#x2F;code&gt; 指令将镜像打包然后在其它位置加载回来。这里使用 nginx 镜像来做演示，将镜像从一台机器手动迁移到另一台机器。&lt;&#x2F;p&gt;
+&lt;!--more--&gt;
+&lt;h3 id=&quot;da-bao-jing-xiang&quot;&gt;打包镜像&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;docker&lt;&#x2F;span&gt;&lt;span&gt; save&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -o&lt;&#x2F;span&gt;&lt;span&gt; nginx.tar nginx:latest
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;然后 &lt;code&gt;nginx:latest&lt;&#x2F;code&gt; 镜像被打包为 &lt;code&gt;nginx.tar&lt;&#x2F;code&gt; 文件，此时可以通过 scp 之类的方法传输这个镜像文件。&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在打包过程中可以使用类似 &lt;code&gt;docker save  nginx | gzip &amp;gt; nginx.tar.gz&lt;&#x2F;code&gt; 的命令进行压缩减小文件体积。&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;更多参数请参考 &lt;a href=&quot;https:&#x2F;&#x2F;docs.docker.com&#x2F;engine&#x2F;reference&#x2F;commandline&#x2F;save&#x2F;&quot;&gt;官方文档&lt;&#x2F;a&gt; 对此命令的说明。&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;jia-zai-jing-xiang&quot;&gt;加载镜像&lt;&#x2F;h3&gt;
+&lt;p&gt;在另一台没有 &lt;code&gt;nginx:latest&lt;&#x2F;code&gt; 镜像的机器上执行：&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;docker&lt;&#x2F;span&gt;&lt;span&gt; load&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -i&lt;&#x2F;span&gt;&lt;span&gt; nginx.tar
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;# 下面为命令输出
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;3358360aedad:&lt;&#x2F;span&gt;&lt;span&gt; Loading layer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;[&lt;&#x2F;span&gt;&lt;span&gt;==================================================&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt;  58.44MB&#x2F;58.44MB
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;c632afbadb38:&lt;&#x2F;span&gt;&lt;span&gt; Loading layer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;[&lt;&#x2F;span&gt;&lt;span&gt;==================================================&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt;  53.91MB&#x2F;53.91MB
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;180ab8f004dc:&lt;&#x2F;span&gt;&lt;span&gt; Loading layer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;[&lt;&#x2F;span&gt;&lt;span&gt;==================================================&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;]&lt;&#x2F;span&gt;&lt;span&gt;  3.584kB&#x2F;3.584kB
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;执行完成后 &lt;code&gt;nginx:latest&lt;&#x2F;code&gt; 镜像就被手动迁移到了另一台机器上。&lt;&#x2F;p&gt;
+&lt;p&gt;更多参数请参考 &lt;a href=&quot;https:&#x2F;&#x2F;docs.docker.com&#x2F;engine&#x2F;reference&#x2F;commandline&#x2F;load&#x2F;&quot;&gt;官方文档&lt;&#x2F;a&gt; 对此命令的说明。&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

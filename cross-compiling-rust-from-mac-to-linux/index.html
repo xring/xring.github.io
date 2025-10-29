@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Mac 平台交叉编译 Rust 至 Linux 平台 | xring&#x27;s blog</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://xring.net/style.css">
+    <link rel="stylesheet" href="https://xring.net/color/orange.css">
+
+        <link rel="stylesheet" href="https://xring.net/color/background_blue.css">
+    
+    <link rel="stylesheet" href="https://xring.net/font-hack-subset.css">
+
+    <meta name="description" content="">
+
+    <meta property="og:description" content="">
+    <meta property="og:title" content="Mac 平台交叉编译 Rust 至 Linux 平台 | xring's blog">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://xring.net/cross-compiling-rust-from-mac-to-linux/">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:title" content="Mac 平台交叉编译 Rust 至 Linux 平台 | xring's blog">
+    <meta property="twitter:domain" content="xring.net">
+    <meta property="twitter:url" content="https://xring.net/cross-compiling-rust-from-mac-to-linux/">
+
+            
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="https://xring.net/atom.xml">
+    
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <meta name="google-adsense-account" content="ca-pub-7408552055522076">
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ksf0q960y1");
+    </script>
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://xring.net" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            xring&#x27;s blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://xring.net">home</a></li>
+            
+                <li><a href="https://xring.net/tags">tags</a></li>
+            
+                <li><a href="https://xring.net/archive">archive</a></li>
+            
+                <li><a href="https://xring.net/about">about</a></li>
+            
+                <li><a href="https://xring.net/atom.xml">rss</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://xring.net/cross-compiling-rust-from-mac-to-linux/">Mac 平台交叉编译 Rust 至 Linux 平台</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2024-10-21
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/cross-compiling/">#cross-compiling</a>&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/rust/">#rust</a></span>
+    
+
+        <div class="post-content">
+            <p>最近在用 Rust 开发一些提效小工具，在 Mac 平台编码但运行环境为 Linux（裸跑，非容器），将相关过程记录一下。</p>
+<p>之前这种跨平台的编译是使用 <a href="https://github.com/cross-rs/cross">cross</a> 来完成的，使用类似下面的命令来进行编译：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">cross</span><span> build</span><span style="color:#bf616a;"> --release --target</span><span> x86_64-unknown-linux-gnu
+</span></code></pre>
+<p>本次直接用 cargo 来解决：</p>
+<ul>
+<li>使用 <code>rustup target add</code> 来添加目标平台的标准库</li>
+<li>安装目标平台的 <code>链接器（linker）</code></li>
+<li>配置 cargo 来使 <code>rustc</code> 能够使用正确的链接器</li>
+<li>设置 <code>TARGET_CC</code> 环境变量</li>
+<li>使用 <code>cargo build</code> 来进行编译</li>
+</ul>
+<h2 id="tian-jia-mu-biao-target">添加目标 target</h2>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">rustup</span><span> target add x86_64-unknown-linux-gnu
+</span></code></pre>
+<h2 id="an-zhuang-mu-biao-ping-tai-de-lian-jie-qi">安装目标平台的链接器</h2>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">brew</span><span> install SergioBenitez/osxct/x86_64-unknown-linux-gnu
+</span></code></pre>
+<h2 id="tian-jia-cargo-pei-zhi-wen-jian">添加 cargo 配置文件</h2>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">mkdir</span><span> .cargo
+</span><span style="color:#bf616a;">touch</span><span> config.toml
+</span></code></pre>
+<p>添加下面的配置文件：</p>
+<pre data-lang="toml" style="background-color:#2b303b;color:#c0c5ce;" class="language-toml "><code class="language-toml" data-lang="toml"><span>[target.x86_64-unknown-linux-gnu]
+</span><span style="color:#bf616a;">linker </span><span>= &quot;</span><span style="color:#a3be8c;">x86_64-unknown-linux-gnu-gcc</span><span>&quot;
+</span></code></pre>
+<h2 id="she-zhi-huan-jing-bian-liang">设置环境变量</h2>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#b48ead;">export </span><span style="color:#bf616a;">TARGET_CC</span><span>=</span><span style="color:#a3be8c;">x86_64-unknown-linux-gnu-gcc
+</span></code></pre>
+<h2 id="kai-shi-bian-yi">开始编译</h2>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">cargo</span><span> build</span><span style="color:#bf616a;"> --release --target</span><span> x86_64-unknown-linux-gnu
+</span></code></pre>
+<p>设置环境变量和编译可以在同一步进行：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">TARGET_CC</span><span>=</span><span style="color:#a3be8c;">x86_64-unknown-linux-gnu-gcc </span><span style="color:#bf616a;">cargo</span><span> build</span><span style="color:#bf616a;"> --release --target</span><span> x86_64-unknown-linux-gnu
+</span></code></pre>
+<p>然后在 <code>./target/x86_64-unknown-linux-gnu/release/</code> 可以找到编译产物。</p>
+<h2 id="yun-xing-huan-jing-glibc-ban-ben-guo-di-wen-ti">运行环境 glibc 版本过低问题</h2>
+<p>当在运行环境执行 <code>./tool-name</code> 时，部分服务器报错了：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">./tool-name:</span><span> /lib64/libc.so.6: version GLIBC_2.25&#39;</span><span style="color:#a3be8c;"> not found (required by ./tool-name)
+</span></code></pre>
+<p>查看 ldd 版本：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">ldd --version
+</span><span style="color:#bf616a;">ldd</span><span> (GNU libc) </span><span style="color:#bf616a;">2.17
+</span><span style="color:#bf616a;">Copyright</span><span> (C) </span><span style="color:#bf616a;">2012</span><span> Free Software Foundation, Inc.
+</span></code></pre>
+<p>这是因为 <code>glibc</code> 版本较低（部分服务器运行好多年了，一直未替换），此时可以升级版本或者使用静态链接方案。升级版本考虑的问题比较多，下面继续看使用静态链接来编译。</p>
+<p>当 target 是 <code>x86_64-unknown-linux-gnu</code> 时，会使用<code>动态链接</code>，也就是在运行时来链接。因此会出现运行环境 glibc 版本不满足要求的情况。换用 <code>x86_64-unknown-linux-musl</code> 这个目标平台来解决问题。</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#65737e;"># 添加目标平台
+</span><span style="color:#bf616a;">rustup</span><span> target add x86_64-unknown-linux-musl
+</span><span style="color:#65737e;"># 安装链接器
+</span><span style="color:#bf616a;">brew</span><span> install FiloSottile/musl-cross/musl-cross
+</span></code></pre>
+<p>然后在 cargo 配置文件 <code>.cargo/config.toml</code> 中添加如下内容：</p>
+<pre data-lang="toml" style="background-color:#2b303b;color:#c0c5ce;" class="language-toml "><code class="language-toml" data-lang="toml"><span>[target.x86_64-unknown-linux-musl]
+</span><span style="color:#bf616a;">linker </span><span>= &quot;</span><span style="color:#a3be8c;">x86_64-linux-musl-gcc</span><span>&quot;
+</span><span style="color:#65737e;"># -static-pie 如果不支持，则再添加下面这一行
+</span><span style="color:#65737e;"># rustflags = [&quot;-C&quot;, &quot;link-args=-static&quot;]
+</span></code></pre>
+<p>最后执行编译：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">TARGET_CC</span><span>=</span><span style="color:#a3be8c;">x86_64-linux-musl-gcc </span><span style="color:#bf616a;">cargo</span><span> build</span><span style="color:#bf616a;"> --release --target</span><span> x86_64-unknown-linux-musl
+</span></code></pre>
+<p>在 <code>./target/x86_64-unknown-linux-musl/release/</code> 可以找到编译产物。这样得到的可执行文件就是通过静态链接的了，应该在大部分的 Linux 上都可以执行。</p>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Read more</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://xring.net/cargo-dependencies-from-git/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">在 Cargo 项目中使用 git 仓库作为依赖</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://xring.net/2024-summary/">
+                            <span class="button__text">2024 总结</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+    <div class="content">
+        <script src="https://giscus.app/client.js"
+        data-repo="xring/blog"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkyNDg0MDg2Mjg="
+        data-category="General"
+        data-category-id="DIC_kwDODs5qNM4CckbH"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+        </script>
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2025
+ xring</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a>
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

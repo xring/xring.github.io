@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>2024 总结 | xring&#x27;s blog</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://xring.net/style.css">
+    <link rel="stylesheet" href="https://xring.net/color/orange.css">
+
+        <link rel="stylesheet" href="https://xring.net/color/background_blue.css">
+    
+    <link rel="stylesheet" href="https://xring.net/font-hack-subset.css">
+
+    <meta name="description" content="">
+
+    <meta property="og:description" content="">
+    <meta property="og:title" content="2024 总结 | xring's blog">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://xring.net/2024-summary/">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:title" content="2024 总结 | xring's blog">
+    <meta property="twitter:domain" content="xring.net">
+    <meta property="twitter:url" content="https://xring.net/2024-summary/">
+
+            
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="https://xring.net/atom.xml">
+    
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <meta name="google-adsense-account" content="ca-pub-7408552055522076">
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ksf0q960y1");
+    </script>
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://xring.net" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            xring&#x27;s blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://xring.net">home</a></li>
+            
+                <li><a href="https://xring.net/tags">tags</a></li>
+            
+                <li><a href="https://xring.net/archive">archive</a></li>
+            
+                <li><a href="https://xring.net/about">about</a></li>
+            
+                <li><a href="https://xring.net/atom.xml">rss</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://xring.net/2024-summary/">2024 总结</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2024-12-31
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/2024/">#2024</a>&nbsp;
+                <a class="post-tag" href="https://xring.net/tags/summary/">#summary</a></span>
+    
+
+        <div class="post-content">
+            <p>今天最后一天了，水一个年终总结。2024算是一个 <code>gap year</code>了，给自己放松了差不多三个月的时间，做了一些思考，也尝试了一些之前从未试过的东西。</p>
+<h2 id="gong-zuo-fang-mian">工作方面</h2>
+<p>掰手指算了一下，“创业”第六年了。在这个团队里有过太多的从0到1，有过太多的造轮子。早几天跟小伙伴们聊起了从追求一个9到两个9到三个9，从网关 rt 500ms 到 80ms，也算是“小有成就”了。</p>
+<h3 id="tuan-dui-jian-she">团队建设</h3>
+<p>作为年轻人聚集地，咱们还是比较稳的。今年有一位后端小伙伴离开，有一位之前离职的测试小伙伴回归。极度扁平，基本不需要团队管理。大家都在自己的位置做自己的事，吃着老板画的饼，大概都在想着明年会不一样吧。</p>
+<h3 id="bian-cheng-yu-yan">编程语言</h3>
+<p>和去年一样，Rust 依然是使用得最多的。今年把几个基础服务从 Go / Java 迁移到了 Rust，我一人一服务，从0到1，管它是不是轮子，能用就好，开心最重要。前端一如既往的烂，倒是尝试学习了一下 TypeScript，没有太多使用场景。然后复习了一下 Python 相关的，写了一些调用大模型的胶水代码。</p>
+<h3 id="xi-tong-jia-gou">系统架构</h3>
+<p>现在回想一下，在18年底就 all in 了 K8S 和 Istio，创业团队没有历史包袱还是舒服的。管它有没有坑，管它会不会，先上了再说。虽说一路踩坑填坑无数，但这玩意儿对于中小团队来说，走过一次基本到处可用了。</p>
+<p>今年在系统架构层面没有太多变更，基础服务有的变动只有配置中心从 etcd 切换到了更轻量的自己造的轮子。春节假期后会做一些 K8S 和 Istio 的升级工作。</p>
+<h3 id="ai-he-llm">AI 和 LLM</h3>
+<p>内部使用的类 ChatGPT 平台经过了多次升级，陆续添加了 OpenAI、Claude、Gemini、DeepSeek 的支持，一年用掉了5000多美刀，看起来还是提升了效率的。</p>
+<p>业务层面接入大模型也终于在下半年启动了，目前有两个场景在尝试中，更多的在路上。</p>
+<p>自己也尝试在借用 AI 和 LLM 相关的做一些独立开发，希望能在明年发布一款自己从需求开始的产品吧。</p>
+<p>近期比较多的精力在这一块了，做一些积累，计划明年在这块能有更多的产出。</p>
+<h3 id="gong-ju">工具</h3>
+<p>单独说一说 <a href="https://wakatime.com/@xring">WakaTime</a> 吧，一个记录“时间”的工作，个人觉得我还挺受用的。</p>
+<h2 id="sheng-huo-fang-mian">生活方面</h2>
+<p>先说说孩子，三岁了，10月份出生的，关于是否上幼儿园的问题跟家里人有一些争执，还是决定晚一些再上幼儿园。春节过后有一次比较严重的生病，去住了几天院，万幸恢复的较好。关于孩子的教育，我个人承行快乐教育，在最近购置了帐篷天幕等装备，希望能坚持户外陪伴。</p>
+<p>然后说说媳妇儿，今年下半年换了工作，是她想要的“稳定”的工作。收入水平有所降低，但不重要，她开心就好了。另一个角度是有更多的时间陪孩子了。</p>
+<p>父母身体状态良好，这个最重要。下半年给父母安排了一场北京游，给我爹安排了心心念念梅兰芳大剧院看京剧。明年上半年需要再安排一次全面体检了。相比父母辈，祖父母、外祖父母辈身体状态较多，也给我妈整的有些憔悴，此处有些槽点...</p>
+<p>自己在生活上没有太多的变化，夏天有过一段时间的健身，没能每天坚持。唯一值得一提的是把英语学习当成了生活的一部分吧，在 Cambly 上了大概 83 节一对一的课，2500多分钟吧，口语能力有一些提升，明年需要更多的坚持。</p>
+<p>今年给自己差不多放了三个月的假，想清了一些东西，也甩掉了一些标签。如果要做个总结，那大概就是 <code>做更好的自己</code> 吧。然后希望明年的总结有更多的内容可以写下。</p>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Read more</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://xring.net/cross-compiling-rust-from-mac-to-linux/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Mac 平台交叉编译 Rust 至 Linux 平台</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://xring.net/lazylock-and-once-lock-in-rust/">
+                            <span class="button__text">Rust 中的 LazyLock 和 OnceLock</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+    <div class="content">
+        <script src="https://giscus.app/client.js"
+        data-repo="xring/blog"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkyNDg0MDg2Mjg="
+        data-category="General"
+        data-category-id="DIC_kwDODs5qNM4CckbH"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+        </script>
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2025
+ xring</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a>
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>
